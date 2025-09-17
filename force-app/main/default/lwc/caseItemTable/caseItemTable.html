@@ -1,0 +1,29 @@
+<template>
+    <div class="slds-p-around_small">
+        <div class="slds-m-bottom_small">
+            <lightning-button
+                variant="destructive"
+                icon-name="utility:delete"
+                label="Delete Selected Case Items"
+                title="Delete selected items"
+                onclick={handleDelete}
+                disabled={noSelection}>
+            </lightning-button>
+        </div>
+
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+        </template>
+
+        <lightning-datatable
+            key-field="Id"
+            data={rows}
+            columns={columns}
+            draft-values={draftValues}
+            onsave={handleSave}
+            onrowselection={handleRowSelect}
+            max-row-selection="999"
+            show-row-number-column>
+        </lightning-datatable>
+    </div>
+</template>

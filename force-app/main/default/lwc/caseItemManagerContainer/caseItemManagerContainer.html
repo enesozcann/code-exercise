@@ -1,0 +1,42 @@
+<template>
+    <lightning-card title="Case Items" icon-name="standard:case">
+        <div slot="actions" class="slds-button-group" role="group">
+            <lightning-button
+                icon-name="utility:add"
+                label="Add Case Item"
+                variant="neutral"
+                onclick={handleOpenAddModal}>
+            </lightning-button>
+            <lightning-button
+                class="slds-m-left_x-small"
+                icon-name="utility:send"
+                icon-position="left"
+                label="Submit Case to Vendor"
+                variant="brand"
+                onclick={handleSubmitCase}
+                disabled={disableSubmit}>
+            </lightning-button>
+        </div>
+
+        <div class="slds-p-horizontal_small slds-p-vertical_x-small slds-grid slds-grid_align-spread slds-border_bottom">
+            <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                <lightning-badge label={itemsBadge}></lightning-badge>
+            </div>
+            <template if:true={isSubmitting}>
+                <lightning-spinner alternative-text="Submitting" size="small"></lightning-spinner>
+            </template>
+        </div>
+
+        <c-case-item-table
+            record-id={recordId}
+            onitemscountchange={handleItemsCountChange}>
+        </c-case-item-table>
+    </lightning-card>
+
+    <c-add-item-modal
+        record-id={recordId}
+        open={addModalOpen}
+        oncancel={handleCloseAddModal}
+        onconfirm={handleAddItemConfirm}>
+    </c-add-item-modal>
+</template>
