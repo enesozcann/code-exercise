@@ -2,6 +2,9 @@ import { LightningElement, api, wire } from 'lwc';
 import { CurrentPageReference } from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { updateRecord, getRecordNotifyChange } from 'lightning/uiRecordApi';
+import { getRecord } from 'lightning/uiRecordApi';
+import STATUS_FIELD from '@salesforce/schema/Case.Status';
+import getOrderByCase from '@salesforce/apex/OrderController.getOrderByCase';
 
 /**
  * @description CaseItemManagerContainer
@@ -9,10 +12,31 @@ import { updateRecord, getRecordNotifyChange } from 'lightning/uiRecordApi';
  */
 export default class CaseItemManagerContainer extends LightningElement {
     @api recordId;
-
+    orderId;
+    orderNumber;
     addModalOpen = false;
     itemsCount = 0;
     isSubmitting = false;
+
+    caseStatus;
+
+    @wire(getRecord, { recordId: '$recordId', fields: [STATUS_FIELD] })
+    wiredCase({ data, error }) {
+        if (data) {
+            this.caseStatus = data.fields.Status.value;
+        } else if (error) {
+            console.error(error);
+        }
+    }
+    @wire(getOrderByCase, { caseId: '$recordId' })
+        wiredOrder({ data, error }) {
+    if (data) {
+        this.orderId = data.Id;
+        this.orderNumber = data.OrderNumber;
+    } else if (error) {
+        console.error(error);
+        }
+    }
 
     @wire(CurrentPageReference)
     setStateFromUrl(stateRef) {
@@ -26,6 +50,17 @@ export default class CaseItemManagerContainer extends LightningElement {
     }
     get itemsBadge() {
         return `Items: ${this.itemsCount}`;
+    }
+    get isLocked() {
+        return this.caseStatus === 'Order Created' || this.caseStatus === 'Submit to Vendor';
+    }
+    
+    get hasOrder() {
+    return !!this.orderId; 
+    }
+
+    get orderUrl() {
+        return `/lightning/r/Order/${this.orderId}/view`;
     }
     // modal handlers
     handleOpenAddModal() { this.addModalOpen = true; }

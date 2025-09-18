@@ -1,14 +1,16 @@
 <template>
     <div class="slds-p-around_small">
         <div class="slds-m-bottom_small">
-            <lightning-button
-                variant="destructive"
-                icon-name="utility:delete"
-                label="Delete Selected Case Items"
-                title="Delete selected items"
-                onclick={handleDelete}
-                disabled={noSelection}>
-            </lightning-button>
+            <template if:false={locked}>
+                <lightning-button
+                    variant="destructive"
+                    icon-name="utility:delete"
+                    label="Delete Selected Case Items"
+                    title="Delete selected items"
+                    onclick={handleDelete}
+                    disabled={noSelection}>
+                </lightning-button>
+            </template>
         </div>
 
         <template if:true={isLoading}>

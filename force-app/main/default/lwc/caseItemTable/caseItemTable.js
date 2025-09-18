@@ -11,15 +11,18 @@ import { refreshApex } from '@salesforce/apex';
 export default class CaseItemTable extends LightningElement {
     @api recordId;
     @track rows = [];
+    @api locked;
     draftValues = [];
     selectedIds = new Set();
     isLoading = false;
 
-    columns = [
+    get columns() {
+        return [
         { label: 'Product Code', fieldName: 'productCode', type: 'text', cellAttributes: { alignment: 'left' } },
         { label: 'Product Name', fieldName: 'productName', type: 'text', cellAttributes: { alignment: 'left' } },
-        { label: 'Quantity', fieldName: 'Quantity__c', type: 'number', editable: true }
-    ];
+        { label: 'Quantity', fieldName: 'Quantity__c', type: 'number', editable: !this.locked }
+        ]
+    };
 
     wiredResult;
 
@@ -74,6 +77,10 @@ export default class CaseItemTable extends LightningElement {
     }
 
     async handleSave(event) {
+        if(this.locked){
+            this.toast('Not allowed', 'Cannot edit items when case is locked', 'error');
+            return;
+        }
         const changes = event?.detail?.draftValues || this.draftValues;
         if (!changes || changes.length === 0) return;
         try {
